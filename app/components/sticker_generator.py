@@ -96,15 +96,117 @@ def _suavizar_catmull_rom(pts: List[Tuple[float, float]], pasos_por_seg: int = 6
     return out
 
 
+_CIRCUITS_CACHE: Optional[List[Dict[str, Any]]] = None
+
+_GP_KEYWORDS_TO_CIRCUIT: Dict[str, str] = {
+    "bahrain": "bahrain",
+    "sakhir": "bahrain",
+    "saudi": "jeddah",
+    "australian": "melbourne",
+    "japanese": "suzuka",
+    "japan": "suzuka",
+    "chinese": "shanghai",
+    "miami": "miami",
+    "emilia": "imola",
+    "san marino": "imola",
+    "monaco": "monaco",
+    "canadian": "montreal",
+    "spanish": "catalunya",
+    "spain": "catalunya",
+    "austrian": "spielberg",
+    "styrian": "spielberg",
+    "british": "silverstone",
+    "hungarian": "hungaroring",
+    "belgian": "spa",
+    "dutch": "zandvoort",
+    "italian": "monza",
+    "azerbaijan": "baku",
+    "singapore": "singapore",
+    "united states": "austin",
+    "mexico": "mexico",
+    "mexican": "mexico",
+    "sao paulo": "interlagos",
+    "brazilian": "interlagos",
+    "brazil": "interlagos",
+    "las vegas": "las vegas",
+    "qatar": "lusail",
+    "abu dhabi": "yas marina",
+    "french": "paul ricard",
+    "german": "hockenheim",
+    "eifel": "nurburgring",
+    "european": "nurburgring",
+    "tuscan": "mugello",
+    "portuguese": "portimao",
+    "turkish": "istanbul",
+    "russian": "sochi",
+    "malaysian": "sepang",
+}
+
+
+def _cargar_circuitos_reales() -> List[Dict[str, Any]]:
+    global _CIRCUITS_CACHE
+    if _CIRCUITS_CACHE is not None:
+        return _CIRCUITS_CACHE
+    ruta = Path(__file__).resolve().parent.parent / "assets" / "circuits_outlines.json"
+    if not ruta.exists():
+        _CIRCUITS_CACHE = []
+        return _CIRCUITS_CACHE
+    try:
+        import json as _json
+
+        data = _json.loads(ruta.read_text(encoding="utf-8"))
+        _CIRCUITS_CACHE = data if isinstance(data, list) else []
+    except Exception:
+        _CIRCUITS_CACHE = []
+    return _CIRCUITS_CACHE
+
+
+def _buscar_trazado_real(codigo: str, gp: str = "") -> Optional[List[List[float]]]:
+    import unicodedata
+
+    def _norm(s: str) -> str:
+        s = unicodedata.normalize("NFKD", str(s or "")).encode("ascii", "ignore").decode("ascii").lower()
+        return " ".join("".join(c if c.isalnum() or c == " " else " " for c in s).split())
+
+    circuitos = _cargar_circuitos_reales()
+    if not circuitos:
+        return None
+    gp_n = _norm(gp)
+    cod_n = _norm(codigo)
+
+    # 1. Buscar por alias de nombre de GP
+    for kw, target in _GP_KEYWORDS_TO_CIRCUIT.items():
+        if kw in gp_n:
+            for c in circuitos:
+                if target in c.get("keys", ""):
+                    return c.get("pts")
+
+    # 2. Coincidencia directa por tokens de GP o código
+    tokens = [t for t in gp_n.split() if len(t) >= 4 and t not in {"grand", "prix", "formula"}]
+    for c in circuitos:
+        keys = c.get("keys", "")
+        if any(t in keys for t in tokens):
+            return c.get("pts")
+    if len(cod_n) == 3:
+        for c in circuitos:
+            if cod_n in c.get("keys", ""):
+                return c.get("pts")
+    return None
+
+
 def _dibujar_silueta_circuito(
-    draw: ImageDraw.ImageDraw, codigo: str, x0: int, y0: int, w: int, h: int
+    draw: ImageDraw.ImageDraw, codigo: str, x0: int, y0: int, w: int, h: int, gp: str = ""
 ) -> None:
-    ctrl = _CONTROL_CIRCUITOS.get(codigo.upper(), _CONTROL_DEFAULT)
-    suave = _suavizar_catmull_rom(ctrl, pasos_por_seg=6)
-    pts = [(x0 + px * w, y0 + py * h) for px, py in suave]
+    pts_norm = _buscar_trazado_real(codigo, gp)
+    if not pts_norm:
+        return  # Sin trazado real: dejamos el bloque editorial limpio sin óvalos genéricos
+    side = min(w, h)
+    ox = x0 + (w - side) / 2.0
+    oy = y0 + (h - side) / 2.0
+    pts = [(ox + px * side, oy + py * side) for px, py in pts_norm]
     draw.line(pts, fill=CREAM, width=3, joint="curve")
     sx, sy = pts[0]
-    draw.ellipse([sx - 5, sy - 5, sx + 5, sy + 5], fill=MCLAREN_RED, outline=CREAM, width=1)
+    draw.ellipse([sx - 4, sy - 4, sx + 4, sy + 4], fill=MCLAREN_RED, outline=CREAM, width=1)
 
 
 def _dibujar_codigo_barras(
@@ -257,7 +359,7 @@ def generar_sticker_ticket_png(entrada: Dict[str, Any], formato: str = "ig") -> 
         d.rectangle([lx0, ly0, lx1, ly1], fill=stub_color)
         d.text((lx0 + 24, ly0 + 18), f"TEMPORADA {anio}", fill="#E5E0D5", font=_load_font(17, mono=True))
         d.text((lx0 + 22, ly0 + 52), codigo, fill=CREAM, font=_load_font(114, bold=True))
-        _dibujar_silueta_circuito(d, codigo, lx0 + 46, ly0 + 205, 226, 175)
+        _dibujar_silueta_circuito(d, codigo, lx0 + 46, ly0 + 205, 226, 175, gp=gp)
         d.text((lx0 + 24, ly1 - 40), f"RONDA {ronda:02d}  |  {estrellas:.1f}/5", fill="#E5E0D5", font=_load_font(19, bold=True, mono=True))
 
         # Línea troquelada vertical + muescas arriba y abajo
@@ -328,7 +430,7 @@ def generar_sticker_ticket_png(entrada: Dict[str, Any], formato: str = "ig") -> 
         d.rectangle([gx0, gy0, gx1, gy1], fill=stub_color)
         d.text((gx0 + 26, gy0 + 36), codigo, fill=CREAM, font=_load_font(134, bold=True))
         d.text((gx0 + 30, gy0 + 198), f"{anio}  |  {estrellas:.1f} / 5.0", fill="#FFD100", font=_load_font(26, bold=True, mono=True))
-        _dibujar_silueta_circuito(d, codigo, gx1 - 224, gy0 + 40, 194, 184)
+        _dibujar_silueta_circuito(d, codigo, gx1 - 224, gy0 + 40, 194, 184, gp=gp)
 
         # Muescas laterales + línea troquelada horizontal
         cy = pad + 412
