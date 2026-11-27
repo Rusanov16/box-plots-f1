@@ -66,10 +66,10 @@ def render_comparativa_circuito(laps_df: pd.DataFrame, metadata: dict | None = N
 
     if st.button("Generar Mapa de Calor del Circuito (Vuelta Rápida)", type="primary"):
         col_m1, col_m2 = st.columns(2)
-        for col_ui, piloto in ((col_m1, p1), (col_m2, p2)):
+        for idx, (col_ui, piloto) in enumerate(((col_m1, p1), (col_m2, p2))):
             mejor = _mejor_vuelta_piloto(laps_df, piloto)
             if mejor is None or pd.isna(mejor.get("LapStartDate")):
-                col_ui.warning(f"Sin vuelta rápida con timestamp para {piloto}.")
+                col_ui.info(f"Sin coordenadas disponibles para {piloto} en esta sesión.")
                 continue
             with st.spinner(f"Descargando trazado y telemetría de {piloto}..."):
                 try:
@@ -79,11 +79,14 @@ def render_comparativa_circuito(laps_df: pd.DataFrame, metadata: dict | None = N
                         lap_start_iso=str(mejor["LapStartDate"]),
                         lap_duration_s=float(mejor["_s"]),
                     )
+                    if tel_df is None or tel_df.empty or "x" not in tel_df.columns or "y" not in tel_df.columns:
+                        col_ui.info(f"Sin coordenadas disponibles para {piloto} en esta sesión.")
+                        continue
                     fig_map = grafico_mapa_calor_circuito(
                         tel_df,
                         metrica=metrica,
                         titulo=f"{piloto} — Vuelta {int(mejor['numero_vuelta'])} ({mejor['_s']:.3f}s)",
                     )
-                    col_ui.plotly_chart(fig_map, use_container_width=True)
-                except Exception as exc:
-                    col_ui.error(f"Error generando mapa para {piloto}: {exc}")
+                    col_ui.plotly_chart(fig_map, use_container_width=True, key=f"mapa_calor_{idx}_{piloto}")
+                except Exception:
+                    col_ui.info(f"Sin coordenadas disponibles para {piloto} en esta sesión.")
