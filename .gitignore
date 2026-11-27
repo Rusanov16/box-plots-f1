@@ -1,0 +1,40 @@
+# Entornos virtuales y cachés Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secretos y configuración local (NUNCA subir a GitHub)
+.env
+.streamlit/secrets.toml
+
+# Cachés y logs locales de FastF1
+data/fastf1_cache/
+data/logs/
+
+# IDE / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Archivos internos / borradores (no publicar en GitHub)
+.agents/
+papers/
+fastf1.ipynb
+CAMBIOS_v3.md
+METODOLOGIA_PREDICTIVA.md
+.env.example
+sql/
+app/admin_pages/
+data/raceboxd.json
+src/db/
+src/etl/loader.py
+tests/test_db_repositories.py
+src/api/
+src/domain/conceptos.py
+app/pages/07_Predicciones_IA.py
+src/ml/
+src/etl/weather_service.py
+src/domain/reports.py
+tests/test_ml_predictor.py
