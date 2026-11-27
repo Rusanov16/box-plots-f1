@@ -196,9 +196,11 @@ def extraer_mapa_calor_openf1(
 ) -> pd.DataFrame:
     """Descarga coordenadas `(x, y)` y telemetría (`speed`, `throttle`, `n_gear`) de una vuelta en OpenF1."""
     inicio = pd.Timestamp(lap_start_iso)
+    if inicio.tzinfo is not None:
+        inicio = inicio.tz_convert("UTC").tz_localize(None)
     fin = inicio + pd.Timedelta(seconds=float(lap_duration_s) + 1.0)
-    ini_str = inicio.isoformat()
-    fin_str = fin.isoformat()
+    ini_str = inicio.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+    fin_str = fin.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
 
     url_loc = (
         f"{OPENF1_BASE_URL}/location?session_key={int(session_key)}"
@@ -209,8 +211,12 @@ def extraer_mapa_calor_openf1(
         f"&driver_number={int(driver_number)}&date>={ini_str}&date<={fin_str}"
     )
     r_loc = requests.get(url_loc, timeout=20)
+    if r_loc.status_code == 404:
+        return pd.DataFrame()
     r_loc.raise_for_status()
     r_car = requests.get(url_car, timeout=20)
+    if r_car.status_code == 404:
+        return pd.DataFrame()
     r_car.raise_for_status()
 
     loc_df = pd.DataFrame(r_loc.json())
