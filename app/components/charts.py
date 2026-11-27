@@ -120,7 +120,7 @@ def grafico_mapa_calor_circuito(
 COLORES_PIRELLI = {
     "SOFT": "#E10600",
     "MEDIUM": "#FFD12E",
-    "HARD": "#E8E8E8",
+    "HARD": "#8E949E",
     "INTERMEDIATE": "#43B02A",
     "WET": "#0067AD",
 }
