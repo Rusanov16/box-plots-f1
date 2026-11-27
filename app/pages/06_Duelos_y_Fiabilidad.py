@@ -181,7 +181,22 @@ if df_temp is not None and not df_temp.empty:
                             st.warning("Ninguno de los dos pilotos registró vueltas en este GP.")
                         else:
                             sub["Piloto"] = sub["driverId"].map({id1: p1, id2: p2})
-                            sub["Segundos"] = pd.to_timedelta(sub["time"], errors="coerce").dt.total_seconds()
+
+                            def _parse_lap_s(val: object) -> float:
+                                s = str(val or "").strip()
+                                if ":" in s:
+                                    partes = s.split(":")
+                                    try:
+                                        if len(partes) == 2:
+                                            return float(partes[0]) * 60.0 + float(partes[1])
+                                        if len(partes) == 3:
+                                            return float(partes[0]) * 3600.0 + float(partes[1]) * 60.0 + float(partes[2])
+                                    except ValueError:
+                                        return float("nan")
+                                td = pd.to_timedelta(s, errors="coerce")
+                                return float(td.total_seconds()) if pd.notna(td) else float("nan")
+
+                            sub["Segundos"] = sub["time"].apply(_parse_lap_s)
                             sub = sub[sub["Segundos"].notna() & (sub["Segundos"] > 0)]
                             fig_v = px.line(
                                 sub,
