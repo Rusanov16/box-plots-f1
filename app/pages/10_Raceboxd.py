@@ -277,10 +277,10 @@ with tab_reviews:
                         value=float(r.get("estrellas", 4.5)),
                     )
                     n_fav = e2.checkbox("Favorita 🏎️", value=bool(r.get("favorita", False)))
-                    tags_prev = [t for t in (r.get("etiquetas") or []) if t in ETIQUETAS_RAPIDAS][:2]
+                    tags_prev = [t for t in (r.get("etiquetas") or []) if t in ETIQUETAS_CARRERA][:2]
                     n_tags = st.multiselect(
                         "Etiquetas rápidas (máx. 2)",
-                        options=ETIQUETAS_RAPIDAS,
+                        options=ETIQUETAS_CARRERA,
                         default=tags_prev,
                         max_selections=2,
                     )
