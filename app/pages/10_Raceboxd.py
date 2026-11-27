@@ -65,21 +65,14 @@ _MESES_ES = {
 
 
 def _cargar_diario() -> List[Dict[str, Any]]:
-    """Capa de persistencia desacoplada (local JSON; lista para migrar a Supabase/Sheets)."""
-    if not DATA_FILE.exists():
-        DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-        DATA_FILE.write_text(json.dumps(_SEMILLA_INICIAL, ensure_ascii=False, indent=2), encoding="utf-8")
-        return list(_SEMILLA_INICIAL)
-    try:
-        data = json.loads(DATA_FILE.read_text(encoding="utf-8"))
-        return data if isinstance(data, list) else []
-    except Exception:
-        return []
+    """Diario privado por sesión de usuario (listo para migrar a BD con cuentas en v2)."""
+    if "raceboxd_diario" not in st.session_state:
+        st.session_state["raceboxd_diario"] = list(_SEMILLA_INICIAL)
+    return list(st.session_state["raceboxd_diario"])
 
 
 def _guardar_diario(entradas: List[Dict[str, Any]]) -> None:
-    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    DATA_FILE.write_text(json.dumps(entradas, ensure_ascii=False, indent=2), encoding="utf-8")
+    st.session_state["raceboxd_diario"] = list(entradas)
 
 
 @st.cache_data(ttl=24 * 3600, show_spinner=False)
