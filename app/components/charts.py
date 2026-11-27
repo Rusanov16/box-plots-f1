@@ -37,16 +37,18 @@ def grafico_ritmo_vueltas(
     col_vuelta = "numero_vuelta" if "numero_vuelta" in df.columns else "LapNumber"
     col_piloto = "id_piloto" if "id_piloto" in df.columns else "Driver"
 
+    paleta = ["#E11D24", "#1C1C1C"] if df[col_piloto].nunique() == 2 else None
     fig = px.line(
         df,
         x=col_vuelta,
         y="segundos",
         color=col_piloto,
         markers=True,
+        color_discrete_sequence=paleta,
         title=titulo,
         labels={col_vuelta: "Número de vuelta", "segundos": "Tiempo (s)", col_piloto: "Piloto"},
     )
-    fig.update_layout(hovermode="x unified")
+    fig.update_layout(hovermode="x unified", margin=dict(r=115))
     return fig
 
 
@@ -69,6 +71,7 @@ def grafico_degradacion_stints(degradacion: list[dict]) -> go.Figure:
             "compuesto": "Compuesto",
         },
     )
+    fig.update_layout(margin=dict(r=120))
     return fig
 
 

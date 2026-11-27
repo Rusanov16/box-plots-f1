@@ -252,7 +252,7 @@ with tab_pirelli:
         ("SOFT", "#E11D24", 5, 1, "Clasificación (Qualy) y stints cortos de máximo ataque."),
         ("MEDIUM", "#FFD100", 3, 3, "Equilibrio ideal para estrategias a 1 o 2 paradas."),
         ("HARD", "#D9D9D9", 2, 5, "Stints largos en circuitos exigentes o asfalto abrasivo."),
-        ("INTERMEDIATE", "#277B47", 4, 3, "Pista húmeda o lluvia ligera (~30 L/s a 300 km/h)."),
+        ("INTERMEDIO", "#277B47", 4, 3, "Pista húmeda o lluvia ligera (~30 L/s a 300 km/h)."),
         ("WET", "#1E6BD6", 3, 4, "Lluvia intensa y agua estancada (~85 L/s a 300 km/h)."),
     ]
 
@@ -339,9 +339,9 @@ with tab_pirelli:
 with tab_2026:
     st.subheader("Nuevo Reglamento Técnico FIA 2026")
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Potencia Eléctrica", "50% · 350 kW", delta="3x vs. 2025 (120 kW)")
+    k1.metric("Potencia Eléctrica", "350 kW", delta="50% eléctrica · 3x vs. 2025")
     k2.metric("Peso Mínimo", "768 kg", delta="-30 kg más ágiles", delta_color="inverse")
-    k3.metric("Combustible", "100% E-Fuel", delta="Sostenible (cero fósil)")
+    k3.metric("Combustible", "E-Fuel", delta="100% sostenible (cero fósil)")
     k4.metric("Parrilla 2026", "22 Pilotos", delta="11 equipos (+Audi, +Cadillac)")
 
     # Láminas técnicas editoriales FIA 2026

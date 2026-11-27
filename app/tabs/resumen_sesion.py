@@ -23,7 +23,7 @@ def render_resumen_sesion(laps_df: pd.DataFrame) -> None:
     c1.metric("Total de vueltas", total_vueltas)
     c2.metric("Pilotos", total_pilotos)
     c3.metric(
-        "Vueltas de Pit / SC / lentas",
+        "Vueltas Pit / SC",
         total_anomalias,
         help="Vueltas fuera del ritmo normal (boxes, Safety Car, VSC o banderas amarillas).",
     )

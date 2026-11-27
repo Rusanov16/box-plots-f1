@@ -120,11 +120,13 @@ if df_temp is not None and not df_temp.empty:
         gana_1 = int((ambos["position_1"] < ambos["position_2"]).sum())
         gana_2 = int((ambos["position_2"] < ambos["position_1"]).sum())
 
+        ap1 = p1.split()[-1] if p1 else p1
+        ap2 = p2.split()[-1] if p2 else p2
         m1, m2, m3, m4 = st.columns(4)
-        m1.metric(f"Puntos {p1}", f"{d1['points'].sum():.1f}")
-        m2.metric(f"Puntos {p2}", f"{d2['points'].sum():.1f}")
-        m3.metric(f"Delante en carrera ({p1})", gana_1)
-        m4.metric(f"Delante en carrera ({p2})", gana_2)
+        m1.metric(f"Puntos · {ap1}", f"{d1['points'].sum():.1f}")
+        m2.metric(f"Puntos · {ap2}", f"{d2['points'].sum():.1f}")
+        m3.metric(f"Carrera H2H · {ap1}", gana_1)
+        m4.metric(f"Carrera H2H · {ap2}", gana_2)
 
         # Curva acumulada de puntos
         curva = pd.DataFrame(
@@ -141,11 +143,12 @@ if df_temp is not None and not df_temp.empty:
             color="Piloto",
             markers=True,
             color_discrete_sequence=[MCLAREN_RED, INK_CHARCOAL],
-            title=f"Evolución del Campeonato {anio_cargado}: {p1} vs {p2}",
+            title=f"Evolución del Campeonato {anio_cargado}: {ap1} vs {ap2}",
         )
         estilizar_plotly_editorial(fig_curva)
         fig_curva.update_layout(
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title_text="")
+            margin=dict(t=82),
+            legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0, title_text=""),
         )
         st.plotly_chart(fig_curva, width="stretch")
 

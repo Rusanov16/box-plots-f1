@@ -45,4 +45,14 @@ def render_estrategia_neumaticos(laps_df: pd.DataFrame) -> None:
 
     fig = grafico_degradacion_stints(degradacion)
     st.plotly_chart(fig, width="stretch")
-    st.dataframe(pd.DataFrame(degradacion), width="stretch")
+    df_deg_vista = pd.DataFrame(degradacion).rename(
+        columns={
+            "id_piloto": "Piloto",
+            "stint": "Stint",
+            "compuesto": "Compuesto",
+            "vueltas_analizadas": "Vueltas",
+            "degradacion_s_por_vuelta": "Degradación (s/vta)",
+            "ritmo_medio_s": "Ritmo medio (s)",
+        }
+    )
+    st.dataframe(df_deg_vista, width="stretch", hide_index=True)

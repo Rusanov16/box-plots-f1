@@ -82,7 +82,21 @@ def _cargar_perfil_piloto(driver_id: str) -> pd.DataFrame:
                     "points": pd.to_numeric(r.get("points"), errors="coerce") or 0.0,
                     "Escudería": str(r.get("constructorName", "")),
                     "Nombre": f"{r.get('givenName', '')} {r.get('familyName', '')}".strip(),
-                    "Nacionalidad": str(r.get("driverNationality", "")),
+                    "Nacionalidad": {
+                        "Argentine": "Argentina",
+                        "British": "Británica",
+                        "German": "Alemana",
+                        "Brazilian": "Brasileña",
+                        "French": "Francesa",
+                        "Austrian": "Austríaca",
+                        "Spanish": "Española",
+                        "Dutch": "Neerlandesa",
+                        "Italian": "Italiana",
+                        "Finnish": "Finlandesa",
+                        "Australian": "Australiana",
+                        "Monegasque": "Monegasca",
+                        "Mexican": "Mexicana",
+                    }.get(str(r.get("driverNationality", "")), str(r.get("driverNationality", ""))),
                 }
             )
         if n_lote < limit or offset >= 600:
