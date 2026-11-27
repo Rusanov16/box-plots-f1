@@ -160,18 +160,20 @@ if df_temp is not None and not df_temp.empty:
             opciones_gp = {f"R{int(r['round'])} — {r['raceName']}": int(r["round"]) for _, r in carreras.iterrows()}
             gp_sel = st.selectbox("Selecciona un Gran Premio para ver ritmo vuelta a vuelta", list(opciones_gp.keys()))
             if st.button("Comparar tiempos vuelta a vuelta"):
-                with st.spinner("Descargando vueltas desde Ergast..."):
+                with st.spinner("Cargando tiempos vuelta a vuelta..."):
+                    error_api = False
                     try:
                         laps_raw = _cargar_vueltas_gp(anio_cargado, opciones_gp[gp_sel])
                     except Exception:
+                        error_api = True
                         st.warning(
-                            "La API pública de Jolpica/Ergast limitó temporalmente las peticiones (`Too Many Requests`). "
+                            "El servicio de datos históricos limitó temporalmente las peticiones. "
                             "Espera unos segundos y pulsa el botón nuevamente."
                         )
                         laps_raw = pd.DataFrame()
-                    if laps_raw.empty or "driverId" not in laps_raw.columns:
-                        st.warning("No hay tiempos vuelta a vuelta disponibles para este GP.")
-                    else:
+                    if not error_api and (laps_raw.empty or "driverId" not in laps_raw.columns):
+                        st.info("No hay tiempos vuelta a vuelta disponibles para este GP.")
+                    elif not error_api:
                         id1 = str(d1["driverId"].iloc[0]) if not d1.empty else ""
                         id2 = str(d2["driverId"].iloc[0]) if not d2.empty else ""
                         sub = laps_raw[laps_raw["driverId"].isin([id1, id2])].copy()
