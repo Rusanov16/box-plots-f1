@@ -24,7 +24,7 @@ from components.theme import (
     inject_editorial_theme,
     render_crt_header,
 )
-from src.etl.extractor import extraer_temporada_completa_ergast, extraer_vueltas_ergast
+from src.etl.extractor import extraer_temporada_completa_ergast, extraer_vueltas_piloto_ergast
 
 st.set_page_config(page_title="Duelos H2H y Fiabilidad — Box Plots F1", layout="wide")
 inject_editorial_theme()
@@ -53,9 +53,9 @@ def _cargar_temporada_duelos(anio: int) -> pd.DataFrame:
     return _preparar_df_temporada(raw) if not raw.empty else pd.DataFrame()
 
 
-@st.cache_data(ttl=24 * 3600, show_spinner=False, max_entries=40)
-def _cargar_vueltas_gp(anio: int, ronda: int) -> pd.DataFrame:
-    return extraer_vueltas_ergast(int(anio), int(ronda))
+@st.cache_data(ttl=24 * 3600, show_spinner=False, max_entries=60)
+def _cargar_vueltas_gp(anio: int, ronda: int, id1: str, id2: str) -> pd.DataFrame:
+    return extraer_vueltas_piloto_ergast(int(anio), int(ronda), [id1, id2])
 
 
 col_sel, col_info = st.columns([1, 3])
@@ -160,10 +160,12 @@ if df_temp is not None and not df_temp.empty:
             opciones_gp = {f"R{int(r['round'])} — {r['raceName']}": int(r["round"]) for _, r in carreras.iterrows()}
             gp_sel = st.selectbox("Selecciona un Gran Premio para ver ritmo vuelta a vuelta", list(opciones_gp.keys()))
             if st.button("Comparar tiempos vuelta a vuelta"):
+                id1 = str(d1["driverId"].iloc[0]) if not d1.empty else ""
+                id2 = str(d2["driverId"].iloc[0]) if not d2.empty else ""
                 with st.spinner("Cargando tiempos vuelta a vuelta..."):
                     error_api = False
                     try:
-                        laps_raw = _cargar_vueltas_gp(anio_cargado, opciones_gp[gp_sel])
+                        laps_raw = _cargar_vueltas_gp(anio_cargado, opciones_gp[gp_sel], id1, id2)
                     except Exception:
                         error_api = True
                         st.warning(
@@ -174,8 +176,6 @@ if df_temp is not None and not df_temp.empty:
                     if not error_api and (laps_raw.empty or "driverId" not in laps_raw.columns):
                         st.info("No hay tiempos vuelta a vuelta disponibles para este GP.")
                     elif not error_api:
-                        id1 = str(d1["driverId"].iloc[0]) if not d1.empty else ""
-                        id2 = str(d2["driverId"].iloc[0]) if not d2.empty else ""
                         sub = laps_raw[laps_raw["driverId"].isin([id1, id2])].copy()
                         if sub.empty:
                             st.warning("Ninguno de los dos pilotos registró vueltas en este GP.")

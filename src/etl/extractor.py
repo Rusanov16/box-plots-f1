@@ -171,6 +171,46 @@ def extraer_temporada_completa_ergast(anio: int) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
+def extraer_vueltas_piloto_ergast(anio: int, ronda: int, driver_ids: List[str]) -> pd.DataFrame:
+    """Descarga tiempos vuelta a vuelta SOLO de los pilotos indicados (1 petición por piloto)."""
+    if int(anio) < 1996 or not driver_ids:
+        return pd.DataFrame()
+    import time
+    import requests
+
+    filas: List[Dict[str, Any]] = []
+    for idx, did in enumerate([d for d in driver_ids if d]):
+        if idx > 0:
+            time.sleep(0.3)
+        url = f"https://api.jolpi.ca/ergast/f1/{int(anio)}/{int(ronda)}/drivers/{did}/laps.json?limit=100"
+        data = None
+        for intento in range(1, 4):
+            resp = requests.get(url, timeout=15)
+            if resp.status_code == 429:
+                time.sleep(1.0 * intento)
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+            break
+        if not data:
+            continue
+        races = data.get("MRData", {}).get("RaceTable", {}).get("Races", [])
+        if not races:
+            continue
+        for lap in races[0].get("Laps", []):
+            num = int(lap.get("number", 0))
+            for t in lap.get("Timings", []):
+                filas.append(
+                    {
+                        "number": num,
+                        "driverId": str(t.get("driverId", did)),
+                        "position": t.get("position"),
+                        "time": t.get("time"),
+                    }
+                )
+    return pd.DataFrame(filas)
+
+
 def extraer_vueltas_ergast(anio: int, ronda: int) -> pd.DataFrame:
     """Descarga tiempos vuelta a vuelta desde Ergast (disponible desde 1996)."""
     if int(anio) < 1996:
