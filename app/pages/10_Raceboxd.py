@@ -267,6 +267,40 @@ with tab_reviews:
                 mime="image/png",
                 key=f"dl_x_{r.get('id')}",
             )
+            rid = r.get("id")
+            with st.expander("Editar registro"):
+                with st.form(f"edit_form_{rid}"):
+                    e1, e2 = st.columns([2, 1])
+                    n_est = e1.select_slider(
+                        "Calificación (★)",
+                        options=[0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0],
+                        value=float(r.get("estrellas", 4.5)),
+                    )
+                    n_fav = e2.checkbox("Favorita 🏎️", value=bool(r.get("favorita", False)))
+                    tags_prev = [t for t in (r.get("etiquetas") or []) if t in ETIQUETAS_RAPIDAS][:2]
+                    n_tags = st.multiselect(
+                        "Etiquetas rápidas (máx. 2)",
+                        options=ETIQUETAS_RAPIDAS,
+                        default=tags_prev,
+                        max_selections=2,
+                    )
+                    n_resena = st.text_area(
+                        "Reseña / Crónica corta",
+                        value=str(r.get("resena", "")),
+                        max_chars=500,
+                    )
+                    if st.form_submit_button("Guardar cambios", type="primary"):
+                        actualizadas = []
+                        for item in entradas:
+                            if item.get("id") == rid:
+                                item = dict(item)
+                                item["estrellas"] = float(n_est)
+                                item["favorita"] = bool(n_fav)
+                                item["etiquetas"] = list(n_tags)[:2]
+                                item["resena"] = n_resena.strip()
+                            actualizadas.append(item)
+                        _guardar_diario(actualizadas)
+                        st.rerun()
 
 with tab_stats:
     if not entradas:
