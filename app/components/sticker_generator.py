@@ -123,12 +123,25 @@ def _dibujar_codigo_barras(
 
 
 def _load_font(size: int, bold: bool = False, mono: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    mpl_ttf: List[str] = []
+    try:
+        import matplotlib  # type: ignore
+
+        ttf_dir = Path(matplotlib.get_data_path()) / "fonts" / "ttf"
+        if mono:
+            mpl_ttf = [str(ttf_dir / ("DejaVuSansMono-Bold.ttf" if bold else "DejaVuSansMono.ttf"))]
+        else:
+            mpl_ttf = [str(ttf_dir / ("DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"))]
+    except Exception:
+        pass
+
     candidatos: List[str] = []
     if mono:
         candidatos = [
             "C:/Windows/Fonts/consolab.ttf" if bold else "C:/Windows/Fonts/consola.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+            *mpl_ttf,
         ]
     else:
         candidatos = [
@@ -137,6 +150,7 @@ def _load_font(size: int, bold: bool = False, mono: bool = False) -> ImageFont.F
             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
             "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf" if bold else "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+            *mpl_ttf,
         ]
     for path in candidatos:
         if Path(path).exists():

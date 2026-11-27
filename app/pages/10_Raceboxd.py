@@ -252,7 +252,7 @@ with tab_reviews:
                     r_con_podio["podio"] = _podio_gp(int(r.get("anio", 2024)), int(r.get("ronda", 1)))
                 except Exception:
                     r_con_podio["podio"] = ""
-            c_ig, c_x, _ = st.columns([1.15, 1.25, 2])
+            c_ig, c_x, c_ed, _ = st.columns([1.2, 1.3, 0.7, 1.3])
             c_ig.download_button(
                 "Descargar Ticket Vertical (9:16)",
                 data=generar_sticker_ticket_png(r_con_podio, formato="ig"),
@@ -268,7 +268,7 @@ with tab_reviews:
                 key=f"dl_x_{r.get('id')}",
             )
             rid = r.get("id")
-            with st.expander("Editar registro"):
+            with c_ed.popover("Editar"):
                 with st.form(f"edit_form_{rid}"):
                     e1, e2 = st.columns([2, 1])
                     n_est = e1.select_slider(
