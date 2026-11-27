@@ -160,7 +160,7 @@ CHAMPIONSHIP_CARS: Dict[int, Dict[str, Any]] = {
         ]
     },
     2025: {"coches": [{"rol": "Campeón de Pilotos y Constructores", "archivo": "2025", "modelo": "McLaren MCL39", "piloto": "Lando Norris / Oscar Piastri", "creditos": "Rob Marshall, Peter Prodromou, Andrea Stella", "resumen": "Cierre de la normativa de efecto suelo 2022–2025 con excelente gestión térmica de neumáticos."}]},
-    2026: {"coches": [{"rol": "Temporada en curso · Nueva Era FIA 2026", "archivo": "2026", "modelo": "Monoplaza FIA 2026 (Aerodinámica Activa)", "piloto": "Campeonato en disputa", "creditos": "Reglamento Técnico FIA 2026", "resumen": "Inicio de la nueva era técnica: monoplazas más ágiles y ligeros, unidad de potencia 50% eléctrica con combustible 100% sostenible y aerodinámica activa."}]},
+    2026: {"coches": [{"rol": "Campeón de Pilotos y Constructores", "archivo": "2026", "modelo": "Mercedes-AMG F1 W17 E Performance", "piloto": "Andrea Kimi Antonelli / George Russell", "creditos": "James Allison, Simone Resta, John Owen, Hywel Thomas", "resumen": "Referente del estreno reglamentario de 2026, marcando la pauta en el debut de la nueva generación de monoplazas y unidades de potencia."}]},
 }
 
 
