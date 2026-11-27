@@ -208,13 +208,18 @@ with tab_diary:
                 )
 
 with tab_reviews:
-    con_resena = [e for e in entradas_ord if str(e.get("resena", "")).strip()]
-    if not con_resena:
-        st.info("Aún no hay reseñas escritas. Registra una carrera con comentario en **+ Log Race**.")
+    if not entradas_ord:
+        st.info("Aún no hay carreras registradas. Usa **+ Log Race** para puntuar un Gran Premio y descargar tu ticket.")
     else:
-        for r in con_resena:
+        for r in entradas_ord:
             est = _fmt_estrellas(float(r.get("estrellas", 0)))
             corazon = ' <span style="font-size:1.0rem;">🏎️</span>' if r.get("favorita") else ""
+            texto_resena = str(r.get("resena", "")).strip()
+            bloque_resena = (
+                f'<p style="font-size:0.92rem; line-height:1.5; color:#2A2A2A; margin:0;">{_esc(texto_resena)}</p>'
+                if texto_resena
+                else ""
+            )
             bg_poster = (
                 "linear-gradient(155deg, #16241B 0%, #277B47 100%)"
                 if float(r.get("estrellas", 0)) >= 5.0
@@ -231,7 +236,7 @@ with tab_reviews:
                 f'<div style="color:#277B47; font-size:1.02rem; margin:4px 0;">{est}{corazon}</div>'
                 f'<div style="font-family:\'IBM Plex Mono\',monospace; font-size:0.72rem; color:#5A564E; margin-bottom:10px;">'
                 f'Vista el {_esc(r.get("fecha_vista", "—"))} · Ronda {_esc(r.get("ronda", "?"))}</div>'
-                f'<p style="font-size:0.92rem; line-height:1.5; color:#2A2A2A; margin:0;">{_esc(r.get("resena", ""))}</p>'
+                f'{bloque_resena}'
                 f'</div>'
                 f'<div style="width:86px; height:120px; border-radius:6px; border:1px solid #1C1C1C; background:{bg_poster}; '
                 f'color:#F7F4EC; display:flex; flex-direction:column; justify-content:space-between; padding:10px 6px; '
