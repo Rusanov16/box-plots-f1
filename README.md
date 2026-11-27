@@ -1,6 +1,8 @@
-# 🏁 Box Plots F1 — Trazando la Pista
+# Box Plots F1
 
-Plataforma editorial interactiva de **datos, telemetría e historia de la Fórmula 1 (1950–2026)**, diseñada con estética de revista clásica de automovilismo y construida en **Python + Streamlit + Plotly**.
+Plataforma interactiva de **datos, telemetría e historia de la Fórmula 1 (1950–2026)**, construida en **Python + Streamlit + Plotly**.
+
+🔗 **App en vivo:** [box-plots-f1.streamlit.app](https://box-plots-f1.streamlit.app)
 
 > **Fuentes oficiales de datos:** [OpenF1 API](https://openf1.org/) (telemetría y sesiones 2023+) · [Jolpica / Ergast F1 API](https://github.com/jolpica/jolpica-f1) (archivo histórico 1950–2026).
 
