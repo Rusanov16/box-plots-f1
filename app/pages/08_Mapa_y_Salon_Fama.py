@@ -246,7 +246,7 @@ with tab_mapa:
                     lon="lon",
                     hover_name="Circuito",
                     zoom=13.5,
-                    map_style="open-street-map",
+                    map_style="carto-positron",
                     title="Vista de Trazado / Ubicación Exacta de la Pista",
                 )
                 fig_trazado.update_traces(marker=dict(size=12, color="#E10600"))
