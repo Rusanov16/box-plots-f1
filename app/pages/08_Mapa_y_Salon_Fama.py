@@ -245,6 +245,7 @@ with tab_mapa:
                     lat="lat",
                     lon="lon",
                     hover_name="Circuito",
+                    center={"lat": float(rot_lat), "lon": float(rot_lon)},
                     zoom=13.5,
                     map_style="carto-positron",
                     title="Vista de Trazado / Ubicación Exacta de la Pista",
